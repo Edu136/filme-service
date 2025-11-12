@@ -15,17 +15,9 @@ import java.util.List;
 @Service
 public class TokenService {
 
-    // Injeta a chave secreta a partir do application.properties
     @Value("${jwt.token.secret}")
     private String secret;
 
-    /**
-     * Valida um token JWT e extrai as informações (claims) contidas nele.
-     *
-     * @param token O token JWT a ser validado.
-     * @return Um objeto contendo o subject e as authorities do usuário.
-     * @throws JWTVerificationException Se o token for inválido, expirado ou malformado.
-     */
     public ValidationResult validateAndExtractClaims(String token) throws JWTVerificationException {
         Algorithm algorithm = Algorithm.HMAC256(secret);
 

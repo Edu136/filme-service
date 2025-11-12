@@ -1,52 +1,130 @@
 package br.unibh.filmeservice.service;
 
+import br.unibh.filmeservice.dto.AtorCreateDTO;
+import br.unibh.filmeservice.dto.AtorResponseDTO;
 import br.unibh.filmeservice.dto.ElencoCreateDTO;
 import br.unibh.filmeservice.dto.ElencoResponseDTO;
-import br.unibh.filmeservice.entity.ElencoFuncao;
+import br.unibh.filmeservice.entity.Ator;
 import br.unibh.filmeservice.entity.Elenco;
 import br.unibh.filmeservice.entity.Filme;
-import br.unibh.filmeservice.entity.Pessoa;
 import br.unibh.filmeservice.repository.ElencoRepository;
+import br.unibh.filmeservice.repository.FilmeRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ElencoService {
-    private final ElencoRepository elencoRepository;
-    private final FilmeService filmeService;
-    private final PessoaService pessoaService;
 
-    public ElencoService(ElencoRepository elencoRepository, FilmeService filmeService, PessoaService pessoaService) {
-        this.filmeService = filmeService;
-        this.pessoaService = pessoaService;
+    private final ElencoRepository elencoRepository;
+    private final FilmeRepository filmeRepository;
+
+    public ElencoService(ElencoRepository elencoRepository, FilmeRepository filmeRepository) {
         this.elencoRepository = elencoRepository;
+        this.filmeRepository = filmeRepository;
     }
 
-    public ElencoResponseDTO adicionarElenco(ElencoCreateDTO request) {
-        Elenco novoElenco = new Elenco();
-        ElencoFuncao funcao = request.funcao();
+    @Transactional
+    public ElencoResponseDTO createElencoParaFilme(Long filmeId, ElencoCreateDTO dto) {
+        Filme filme = filmeRepository.findById(filmeId)
+                .orElseThrow(() -> new EntityNotFoundException("Filme com ID " + filmeId + " não encontrado."));
 
-        novoElenco.setFuncao(funcao);
-
-        if(funcao == ElencoFuncao.ATOR) {
-            novoElenco.setPersonagem(request.personagem());
-        } else {
-            novoElenco.setPersonagem(null);
+        if (elencoRepository.findByFilmeId(filmeId).isPresent()) {
+            throw new IllegalStateException("Filme com ID " + filmeId + " já possui um elenco.");
         }
 
-        Filme filme = filmeService.findById(request.filmeId());
-        Pessoa pessoa = pessoaService.findById(request.pessoaId());
+        Elenco elenco = new Elenco();
+        elenco.setDiretor(dto.diretor());
+        elenco.setFilme(filme);
 
-        novoElenco.setFilme(filme);
-        novoElenco.setPessoa(pessoa);
+        if (dto.atores() != null) {
+            List<Ator> atores = dto.atores().stream()
+                    .map(atorDTO -> atorDtoToEntity(atorDTO, elenco))
+                    .collect(Collectors.toList());
+            elenco.setAtores(atores);
+        }
 
-        elencoRepository.save(novoElenco);
+        Elenco elencoSalvo = elencoRepository.save(elenco);
+
+        filme.setElenco(elencoSalvo);
+
+        return toResponseDTO(elencoSalvo);
+    }
+
+    @Transactional(readOnly = true)
+    public ElencoResponseDTO findElencoById(Long id) {
+        Elenco elenco = elencoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Elenco com ID " + id + " não encontrado."));
+        return toResponseDTO(elenco);
+    }
+
+    @Transactional(readOnly = true)
+    public ElencoResponseDTO findElencoByFilmeId(Long filmeId) {
+        Elenco elenco = elencoRepository.findByFilmeId(filmeId)
+                .orElseThrow(() -> new EntityNotFoundException("Elenco para o filme com ID " + filmeId + " não encontrado."));
+        return toResponseDTO(elenco);
+    }
+
+    @Transactional
+    public ElencoResponseDTO updateElenco(Long id, ElencoCreateDTO dto) {
+        Elenco elencoExistente = elencoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Elenco com ID " + id + " não encontrado."));
+
+        elencoExistente.setDiretor(dto.diretor());
+
+        elencoExistente.getAtores().clear();
+
+        if (dto.atores() != null) {
+            List<Ator> novosAtores = dto.atores().stream()
+                    .map(atorDTO -> atorDtoToEntity(atorDTO, elencoExistente))
+                    .collect(Collectors.toList());
+            elencoExistente.getAtores().addAll(novosAtores);
+        }
+
+        Elenco elencoAtualizado = elencoRepository.save(elencoExistente);
+        return toResponseDTO(elencoAtualizado);
+    }
+
+    @Transactional
+    public void deleteElenco(Long id) {
+        Elenco elenco = elencoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Elenco com ID " + id + " não encontrado."));
+
+        Filme filme = elenco.getFilme();
+        if (filme != null) {
+            filme.setElenco(null);
+        }
+
+        elencoRepository.delete(elenco);
+    }
+
+    private ElencoResponseDTO toResponseDTO(Elenco elenco) {
+        List<AtorResponseDTO> atorDTOs = elenco.getAtores().stream()
+                .map(ator -> new AtorResponseDTO(
+                        ator.getId(),
+                        ator.getNome(),
+                        ator.getPersonagem(),
+                        ator.getFotoUrl()
+                ))
+                .collect(Collectors.toList());
 
         return new ElencoResponseDTO(
-                novoElenco.getId(),
-                novoElenco.getPersonagem(),
-                novoElenco.getFuncao(),
-                novoElenco.getFilme().getId(),
-                novoElenco.getPessoa().getId()
+                elenco.getId(),
+                elenco.getDiretor(),
+                elenco.getFilme() != null ? elenco.getFilme().getId() : null,
+                atorDTOs
         );
+    }
+
+    private Ator atorDtoToEntity(AtorCreateDTO dto, Elenco elenco) {
+        Ator ator = new Ator();
+        ator.setNome(dto.nome());
+        ator.setPersonagem(dto.personagem());
+        ator.setFotoUrl(dto.fotoUrl());
+        ator.setElenco(elenco);
+        return ator;
     }
 }

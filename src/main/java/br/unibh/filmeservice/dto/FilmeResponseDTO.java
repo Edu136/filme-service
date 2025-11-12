@@ -9,6 +9,10 @@ public record FilmeResponseDTO (
     String descricao,
     Integer duracaoMinutos,
     LocalDate dataLancamento,
-    Set<Long> generos
+    Set<Long> generos,
+    String capaUrl,
+    Integer quantidadeCurtidas,
+    Double mediaAvaliacoes,
+    String userId
 ){
 }

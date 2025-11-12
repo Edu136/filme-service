@@ -20,7 +20,7 @@ public class Favorite {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long idUser;
+    private String idUser;
     private LocalDateTime createdAt;
 
     @ManyToOne (fetch = FetchType.LAZY)

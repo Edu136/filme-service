@@ -16,7 +16,7 @@ public class Review {
     private Long id;
     private Integer rating;
     private String comment;
-    private Long idUser;
+    private String idUser;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "filme_id", nullable = false)

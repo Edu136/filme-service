@@ -1,12 +1,11 @@
 package br.unibh.filmeservice.dto;
 
-import br.unibh.filmeservice.entity.ElencoFuncao;
+import java.util.List;
 
 public record ElencoResponseDTO(
         Long id,
-        String personagem,
-        ElencoFuncao funcao,
+        String diretor,
         Long filmeId,
-        Long pessoaId
+        List<AtorResponseDTO> atores
 ) {
 }

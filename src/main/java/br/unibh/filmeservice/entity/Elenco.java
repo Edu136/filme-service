@@ -5,27 +5,25 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
-
-@Table(name = "elenco_producao")
+@Table(name = "elencos")
 public class Elenco {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    private ElencoFuncao funcao;
+    private String diretor;
 
-    private String personagem;
+    @OneToMany(mappedBy = "elenco", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Ator> atores = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "filme_id", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "filme_id", unique = true, nullable = false)
     private Filme filme;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "pessoa_id", nullable = false)
-    private Pessoa pessoa;
 }

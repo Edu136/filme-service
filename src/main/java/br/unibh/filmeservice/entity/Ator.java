@@ -9,17 +9,16 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-
-public class Imagem {
+public class Ator {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String url;
 
-    @Enumerated(EnumType.STRING)
-    private ImagemType imagemType;
+    private String nome;
+    private String personagem;
+    private String fotoUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "filme_id" , nullable = false)
-    private Filme filme;
+    @JoinColumn(name = "elenco_id", nullable = false)
+    private Elenco elenco;
 }

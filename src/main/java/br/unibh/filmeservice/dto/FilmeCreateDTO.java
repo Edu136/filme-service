@@ -17,6 +17,10 @@ public record FilmeCreateDTO(
     @Positive(message = "A duração em minutos deve ser um valor positivo")
     Integer duracaoMinutos,
     @NotNull(message = "O filme precisa de pelo menos um gênero")
-    Set<Long> generosId
+    Set<Long> generosId,
+    @NotNull(message = "Url da imagem de capa não pode ser nula")
+    String capaUrl,
+    @NotNull(message = "O user do usuario que está cadastrando o filme não pode ser nulo")
+    String idUser
 ) {
 }

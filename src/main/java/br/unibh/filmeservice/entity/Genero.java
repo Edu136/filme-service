@@ -13,12 +13,12 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-
 public class Genero {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nome;
+
     @ManyToMany(mappedBy = "generos")
     private Set<Filme> filmes = new HashSet<>();
 }

@@ -10,11 +10,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-
 @Getter
 @Setter
 @NoArgsConstructor
-
 public class Filme {
 
     @Id
@@ -24,12 +22,19 @@ public class Filme {
     private String descricao;
     private LocalDate dataLancamento;
     private Integer duracaoMinutos;
+    private Double ratingMedia;
+    private Integer numeroLikes;
+    private String urlCapa;
+    private String userId;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     @JoinTable(
-            name = "filmes_generos",
+            name = "filme_genero",
             joinColumns = @JoinColumn(name = "filme_id"),
             inverseJoinColumns = @JoinColumn(name = "genero_id")
     )
     private Set<Genero> generos = new HashSet<>();
+
+    @OneToOne(mappedBy = "filme", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Elenco elenco;
 }
