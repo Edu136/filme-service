@@ -24,8 +24,11 @@ public class Filme {
     private Integer duracaoMinutos;
     private Double ratingMedia;
     private Integer numeroLikes;
-    private String urlCapa;
     private String userId;
+
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "imagens_id", referencedColumnName = "id")
+    private ImagensFilme imagens;
 
     @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     @JoinTable(
@@ -35,6 +38,7 @@ public class Filme {
     )
     private Set<Genero> generos = new HashSet<>();
 
-    @OneToOne(mappedBy = "filme", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "elenco_id", referencedColumnName = "id")
     private Elenco elenco;
 }

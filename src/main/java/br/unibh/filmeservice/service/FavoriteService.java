@@ -44,8 +44,7 @@ public class FavoriteService {
                 novoFavorite.getId(),
                 novoFavorite.getIdUser(),
                 novoFavorite.getFilme().getId(),
-                novoFavorite.getFilme().getTitulo(),
-                novoFavorite.getFilme().getUrlCapa()
+                novoFavorite.getFilme().getTitulo()
         );
     }
 
@@ -59,8 +58,7 @@ public class FavoriteService {
                         fav.getId(),
                         fav.getIdUser(),
                         fav.getFilme().getId(),
-                        fav.getFilme().getTitulo(),
-                        fav.getFilme().getUrlCapa()
+                        fav.getFilme().getTitulo()
                 ))
                 .toList();
     }

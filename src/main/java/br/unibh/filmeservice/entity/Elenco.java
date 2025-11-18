@@ -20,10 +20,11 @@ public class Elenco {
 
     private String diretor;
 
-    @OneToMany(mappedBy = "elenco", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "elenco_id")
     private List<Ator> atores = new ArrayList<>();
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "filme_id", unique = true, nullable = false)
-    private Filme filme;
+    public void addAtor(Ator ator) {
+        atores.add(ator);
+    }
 }

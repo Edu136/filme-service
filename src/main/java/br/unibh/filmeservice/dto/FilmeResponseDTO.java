@@ -11,8 +11,11 @@ public record FilmeResponseDTO (
     LocalDate dataLancamento,
     Set<Long> generos,
     String capaUrl,
+    String posterUrl,
     Integer quantidadeCurtidas,
     Double mediaAvaliacoes,
-    String userId
+    String userId,
+    String diretor,
+    Set<String> atores
 ){
 }

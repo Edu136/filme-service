@@ -28,6 +28,8 @@ public class SecurityConfigurations {
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/auth/**").permitAll()
 
+                        .requestMatchers("/api/v1/filmes/*/capa").permitAll()
+                        .requestMatchers("/api/v1/filmes/*/poster").permitAll()
                         .requestMatchers("/api/elencos/**").permitAll()
                         .requestMatchers("/api/filmes/**").permitAll()
                         .requestMatchers("/api/generos/**").permitAll()

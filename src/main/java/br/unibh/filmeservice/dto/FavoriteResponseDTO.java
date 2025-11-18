@@ -5,6 +5,5 @@ public record FavoriteResponseDTO(
         Long favoriteId,
         String userId,
         Long filmeId,
-        String filmeTitulo,
-        String filmeCapaUrl
+        String filmeTitulo
 ) {}

@@ -9,11 +9,12 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Ator {
+public class ImagensFilme {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private String nome;
-    private String personagem;
+    @Lob
+    private byte[] capa;
+    @Lob
+    private byte[] poster;
 }

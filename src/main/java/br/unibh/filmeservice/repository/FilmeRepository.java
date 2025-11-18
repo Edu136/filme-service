@@ -17,4 +17,10 @@ public interface FilmeRepository extends JpaRepository<Filme, Long> {
     Optional<Filme> findByIdForUpdate(Long filmeId);
 
     Page<Filme> findByUserId(String userId, Pageable pageable);
+
+    List<Filme> findTop10ByOrderByNumeroLikesDesc();
+
+    List<Filme> findTop15ByOrderByDataLancamentoDesc();
+
+    Page<Filme> findByGeneros_Nome(String nomeGenero, Pageable pageable);
 }

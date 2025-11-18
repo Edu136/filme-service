@@ -1,17 +1,20 @@
 package br.unibh.filmeservice.service;
 
+import br.unibh.filmeservice.dto.AtorCreateDTO;
 import br.unibh.filmeservice.dto.FilmeCreateDTO;
 import br.unibh.filmeservice.dto.FilmeResponseDTO;
-import br.unibh.filmeservice.entity.Filme;
-import br.unibh.filmeservice.entity.Genero;
+import br.unibh.filmeservice.entity.*;
+import br.unibh.filmeservice.mapper.FilmeMapper;
 import br.unibh.filmeservice.repository.FilmeRepository;
 import br.unibh.filmeservice.repository.GeneroRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashSet;
 import java.util.List;
@@ -22,18 +25,24 @@ import java.util.stream.Collectors;
 public class FilmeService {
     private final FilmeRepository filmeRepository;
     private final GeneroRepository generoRepository;
+    private final FilmeMapper filmeMapper;
 
-    public FilmeService(FilmeRepository filmeRepository, GeneroRepository generoRepository) {
+    public FilmeService(FilmeRepository filmeRepository, GeneroRepository generoRepository , FilmeMapper filmeMapper) {
         this.filmeRepository = filmeRepository;
         this.generoRepository = generoRepository;
+        this.filmeMapper = filmeMapper;
     }
 
 
     @Transactional
-    public FilmeResponseDTO adicionarFilme(FilmeCreateDTO req) {
+    public FilmeResponseDTO createFilme(FilmeCreateDTO req, MultipartFile capaFile, MultipartFile posterFile) throws Exception {
+        System.out.println("Criando filme com dados: " + req);
+
+        Filme novoFilme = filmeMapper.toEntity(req);
 
         Set<Genero> generosEncontrados = new HashSet<>();
         Set<Long> generosId = req.generosId();
+
 
         if (generosId != null && !generosId.isEmpty()) {
             List<Genero> generosList = generoRepository.findAllById(generosId);
@@ -48,23 +57,36 @@ public class FilmeService {
 
             generosEncontrados = new HashSet<>(generosList);
         }
-
-        Filme novoFilme = new Filme();
-        novoFilme.setTitulo(req.titulo());
-        novoFilme.setDescricao(req.descricao());
-        novoFilme.setDataLancamento(req.dataLancamento());
-        novoFilme.setDuracaoMinutos(req.duracaoMinutos());
-        novoFilme.setUrlCapa(req.capaUrl());
         novoFilme.setGeneros(generosEncontrados);
-        novoFilme.setRatingMedia(0.0);
-        novoFilme.setNumeroLikes(0);
-        novoFilme.setUserId(req.idUser());
 
+        ImagensFilme imagens = new ImagensFilme();
+        if (capaFile != null && !capaFile.isEmpty()) {
+            imagens.setCapa(capaFile.getBytes());
+        }
+        if (posterFile != null && !posterFile.isEmpty()) {
+            imagens.setPoster(posterFile.getBytes());
+        }
+
+        novoFilme.setImagens(imagens);
+
+        if (req.elenco() != null) {
+            Elenco elenco = new Elenco();
+            elenco.setDiretor(req.elenco().diretor());
+
+            if (req.elenco().atores() != null) {
+                for (AtorCreateDTO atorDto : req.elenco().atores()) {
+                    Ator ator = new Ator();
+                    ator.setNome(atorDto.nome());
+                    ator.setPersonagem(atorDto.personagem());
+                    elenco.addAtor(ator);
+                }
+            }
+            novoFilme.setElenco(elenco);
+        }
         Filme filmeSalvo = filmeRepository.save(novoFilme);
 
-        return toResponseDTO(filmeSalvo);
+        return filmeMapper.toResponseDTO(filmeSalvo);
     }
-
 
     @Transactional(readOnly = true)
     public Page<FilmeResponseDTO> findFilmes(int page, int size , String userId) {
@@ -102,17 +124,29 @@ public class FilmeService {
                 .map(Genero::getId)
                 .collect(Collectors.toSet());
 
-        return new FilmeResponseDTO(
-                filme.getId(),
-                filme.getTitulo(),
-                filme.getDescricao(),
-                filme.getDuracaoMinutos(),
-                filme.getDataLancamento(),
-                idsGeneros,
-                filme.getUrlCapa(),
-                filme.getNumeroLikes(),
-                filme.getRatingMedia(),
-                filme.getUserId()
-        );
+        return filmeMapper.toResponseDTO(filme);
+    }
+
+    @Transactional(readOnly = true)
+    public List<FilmeResponseDTO> getTop10FilmesMaisCurtidos() {
+        List<Filme> filmes = filmeRepository.findTop10ByOrderByNumeroLikesDesc();
+        return filmes.stream()
+                .map(filmeMapper::toResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<FilmeResponseDTO> getFilmesRecentes() {
+        List<Filme> filmes = filmeRepository.findTop15ByOrderByDataLancamentoDesc();
+        return filmes.stream()
+                .map(filmeMapper::toResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public Page<FilmeResponseDTO> getFilmesPorGenero(String nomeGenero, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("ratingMedia").descending());
+        Page<Filme> filmesPage = filmeRepository.findByGeneros_Nome(nomeGenero, pageable);
+        return filmesPage.map(filmeMapper::toResponseDTO);
     }
 }
