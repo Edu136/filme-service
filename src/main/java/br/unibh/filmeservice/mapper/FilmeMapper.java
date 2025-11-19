@@ -1,5 +1,6 @@
 package br.unibh.filmeservice.mapper;
 
+import br.unibh.filmeservice.dto.AtorDTO;
 import br.unibh.filmeservice.dto.FilmeCreateDTO;
 import br.unibh.filmeservice.dto.FilmeResponseDTO;
 import br.unibh.filmeservice.entity.Ator;
@@ -39,7 +40,7 @@ public interface FilmeMapper {
     @Mapping(target = "posterUrl", source = "id", qualifiedByName = "buildPosterUrl")
     @Mapping(target = "userId", source = "userId")
     @Mapping(target = "diretor", source = "elenco.diretor")
-    @Mapping(target = "atores", source = "elenco.atores", qualifiedByName = "atoresToNomes")
+    @Mapping(target = "elenco", source = "elenco.atores", qualifiedByName = "mapElenco")
     FilmeResponseDTO toResponseDTO(Filme filme);
 
     @Mapping(target = "id", ignore = true)
@@ -77,13 +78,13 @@ public interface FilmeMapper {
         return "/api/filmes/" + filmeId + "/poster";
     }
 
-    @Named("atoresToNomes")
-    default Set<String> atoresToNomes(List<Ator> atores) {
+    @Named("mapElenco")
+    default List<AtorDTO> mapElenco(List<Ator> atores) {
         if (atores == null || atores.isEmpty()) {
-            return Collections.emptySet();
+            return Collections.emptyList();
         }
         return atores.stream()
-                .map(Ator::getNome)
-                .collect(Collectors.toSet());
+                .map(ator -> new AtorDTO(ator.getNome(), ator.getPersonagem())) // Pega nome e papel
+                .collect(Collectors.toList());
     }
 }

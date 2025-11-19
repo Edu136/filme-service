@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/favorites")
@@ -63,5 +64,13 @@ public class FavoriteController {
             @PathVariable Long movieId) {
         favoriteService.removeFavorite(userId, movieId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/check")
+    public ResponseEntity<Map<String, Boolean>> checkFavorite(
+            @RequestParam String userId,
+            @RequestParam Long movieId) {
+        boolean isFavorite = favoriteService.isFavorite(userId, movieId);
+        return ResponseEntity.ok(Map.of("isFavorite", isFavorite));
     }
 }

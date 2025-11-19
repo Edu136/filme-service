@@ -79,5 +79,12 @@ public class FavoriteService {
                 .orElseThrow(() -> new IllegalArgumentException("Filme não encontrado com o ID: " + filmeId));
 
         filme.setNumeroLikes(numeroLikes);
+
     }
+
+    @Transactional
+    public boolean isFavorite(String userId, Long movieId) {
+        return favoriteRepository.existsByIdUserAndFilmeId(userId, movieId);
+    }
+
 }

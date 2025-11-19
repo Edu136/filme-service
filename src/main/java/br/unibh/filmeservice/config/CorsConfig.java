@@ -13,11 +13,8 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        // ⚠️ ATENÇÃO: Isso é ótimo para dev, mas inseguro em produção
                         .allowedOrigins("*")
-                        // Permite os métodos que seu app usa
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        // Permite todos os headers
                         .allowedHeaders("*");
             }
         };

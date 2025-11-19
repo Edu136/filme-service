@@ -1,6 +1,7 @@
 package br.unibh.filmeservice.dto;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 public record FilmeResponseDTO (
@@ -16,6 +17,6 @@ public record FilmeResponseDTO (
     Double mediaAvaliacoes,
     String userId,
     String diretor,
-    Set<String> atores
+    List<AtorDTO> elenco
 ){
 }

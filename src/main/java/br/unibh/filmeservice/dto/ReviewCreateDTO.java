@@ -13,6 +13,8 @@ public record ReviewCreateDTO(
         String comment,
         @NotNull(message = "O id do usuário não pode ser nulo")
         String idUser,
+        @NotNull(message = "O nome do usuário não pode ser nulo")
+        String username,
         @NotNull(message = "O id do filme não pode ser nulo")
         Long idFilme
 ) {

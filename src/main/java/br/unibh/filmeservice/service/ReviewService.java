@@ -1,5 +1,6 @@
 package br.unibh.filmeservice.service;
 
+import br.unibh.filmeservice.dto.CurtirReviewDTO;
 import br.unibh.filmeservice.dto.ReviewCreateDTO;
 import br.unibh.filmeservice.dto.ReviewResponseDTO;
 import br.unibh.filmeservice.entity.Filme;
@@ -9,6 +10,7 @@ import br.unibh.filmeservice.repository.ReviewRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -33,6 +35,8 @@ public class ReviewService {
         novoReview.setComment(req.comment());
         novoReview.setIdUser(req.idUser());
         novoReview.setFilme(filme);
+        novoReview.setQtdCurtidas(0);
+        novoReview.setUsername(req.username());
 
         reviewRepository.save(novoReview);
 
@@ -43,8 +47,12 @@ public class ReviewService {
                 novoReview.getRating(),
                 novoReview.getComment(),
                 novoReview.getIdUser(),
+                novoReview.getUsername(),
                 novoReview.getFilme().getId(),
-                novoReview.getFilme().getTitulo()
+                novoReview.getFilme().getTitulo(),
+                novoReview.getQtdCurtidas(),
+                novoReview.getCriadoEm(),
+                novoReview.getUsersIdCurtiram()
         );
     }
 
@@ -56,11 +64,41 @@ public class ReviewService {
                 r.getRating(),
                 r.getComment(),
                 r.getIdUser(),
+                r.getUsername(),
                 r.getFilme().getId(),
-                r.getFilme().getTitulo()
+                r.getFilme().getTitulo(),
+                r.getQtdCurtidas(),
+                r.getCriadoEm(),
+                r.getUsersIdCurtiram()
         )).toList();
     }
 
+    @Transactional
+    public void curtirReview(Long id, CurtirReviewDTO req) {
+        Review review = reviewRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Review com ID " + id + " não encontrado."));
+
+        List<String> usersCurtiram = review.getUsersIdCurtiram();
+        if (usersCurtiram == null) {
+            usersCurtiram = new ArrayList<>();
+        }
+
+        String userId = req.idUser();
+
+        if (req.curtir()) {
+            if (!usersCurtiram.contains(userId)) {
+                usersCurtiram.add(userId);
+                review.setQtdCurtidas(review.getQtdCurtidas() + 1);
+            }
+        } else {
+            if (usersCurtiram.remove(userId)) {
+                review.setQtdCurtidas(Math.max(0, review.getQtdCurtidas() - 1));
+            }
+        }
+
+        review.setUsersIdCurtiram(usersCurtiram);
+        reviewRepository.save(review);
+    }
 
     @Transactional
     public void deleteReview(Long id) {

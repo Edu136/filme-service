@@ -34,7 +34,7 @@ public class SecurityConfigurations {
                         .requestMatchers("/api/filmes/**").permitAll()
                         .requestMatchers("/api/generos/**").permitAll()
                         .requestMatchers("/api/reviews/**").permitAll()
-                        .requestMatchers("/api/favoritos/**").permitAll()
+                        .requestMatchers("/api/favorites/**").permitAll()
                         .requestMatchers(HttpMethod.POST,"/generos/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )

@@ -1,5 +1,6 @@
 package br.unibh.filmeservice.controller;
 
+import br.unibh.filmeservice.dto.CurtirReviewDTO;
 import br.unibh.filmeservice.dto.ReviewCreateDTO;
 import br.unibh.filmeservice.dto.ReviewResponseDTO;
 import br.unibh.filmeservice.service.ReviewService;
@@ -64,5 +65,15 @@ public class ReviewController {
             @PathVariable Long id) {
         reviewService.deleteReview(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
+            summary = "Adicionar curtida a uma avaliação",
+            description = "Adiciona uma curtida a uma avaliação específica"
+    )
+    @PostMapping("/{id}/curtir")
+    public ResponseEntity<Void> adicionarCurtida(@PathVariable Long id, @Valid @RequestBody CurtirReviewDTO req){
+        reviewService.curtirReview(id, req);
+        return ResponseEntity.ok().build();
     }
 }
