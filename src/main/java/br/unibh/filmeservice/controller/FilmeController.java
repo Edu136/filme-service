@@ -146,4 +146,14 @@ public class FilmeController {
         return ResponseEntity.ok(filmesPage);
     }
 
+    @GetMapping("/adicionados/{userId}")
+    public ResponseEntity<Page<FilmeResponseDTO>> getFilmesAdicionadosPor(
+            @PathVariable String userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ){
+        Page<FilmeResponseDTO> filmesPages = filmeService.getFilmesAdicionadosPor(userId,page,size);
+        return ResponseEntity.ok(filmesPages);
+    }
+
 }

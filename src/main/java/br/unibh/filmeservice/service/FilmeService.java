@@ -149,4 +149,11 @@ public class FilmeService {
         Page<Filme> filmesPage = filmeRepository.findByGeneros_Nome(nomeGenero, pageable);
         return filmesPage.map(filmeMapper::toResponseDTO);
     }
+
+    @Transactional(readOnly = true)
+    public Page<FilmeResponseDTO> getFilmesAdicionadosPor(String userId, int page, int size){
+        Pageable pageable = PageRequest.of(page, size, Sort.by("dataLancamento").descending());
+        Page<Filme> filmesPage = filmeRepository.findByUserId(userId, pageable);
+        return filmesPage.map(filmeMapper::toResponseDTO);
+    }
 }

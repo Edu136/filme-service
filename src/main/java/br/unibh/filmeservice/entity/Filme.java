@@ -19,6 +19,7 @@ public class Filme {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String titulo;
+    @Column(length = 2000)
     private String descricao;
     private LocalDate dataLancamento;
     private Integer duracaoMinutos;
