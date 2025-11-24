@@ -5,6 +5,7 @@ import br.unibh.filmeservice.dto.FavoriteResponseDTO;
 import br.unibh.filmeservice.service.FavoriteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/favorites")
 @Tag(name = "Favoritos", description = "API para gerenciamento de filmes favoritos dos usuários")
+@SecurityRequirement(name = "bearerAuth")
 public class FavoriteController {
 
     private final FavoriteService favoriteService;

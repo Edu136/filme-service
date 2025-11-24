@@ -94,7 +94,7 @@ public class FilmeService {
         Pageable pageable = PageRequest.of(page, size);
 
         if (userId != null && !userId.isEmpty()) {
-            return filmeRepository.findByUserId(userId, pageable).map(this::toResponseDTO);
+            return filmeRepository.findByUserIdOrderByNumeroLikesDesc(userId, pageable).map(this::toResponseDTO);
         } else{
             return filmeRepository.findAll(pageable).map(this::toResponseDTO);
         }
@@ -154,7 +154,7 @@ public class FilmeService {
     @Transactional(readOnly = true)
     public Page<FilmeResponseDTO> getFilmesAdicionadosPor(String userId, int page, int size){
         Pageable pageable = PageRequest.of(page, size, Sort.by("dataLancamento").descending());
-        Page<Filme> filmesPage = filmeRepository.findByUserId(userId, pageable);
+        Page<Filme> filmesPage = filmeRepository.findByUserIdOrderByNumeroLikesDesc(userId, pageable);
         return filmesPage.map(filmeMapper::toResponseDTO);
     }
 

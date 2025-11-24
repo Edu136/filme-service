@@ -16,7 +16,7 @@ public interface FilmeRepository extends JpaRepository<Filme, Long> {
     @Query("SELECT f FROM Filme f WHERE f.id = :filmeId")
     Optional<Filme> findByIdForUpdate(Long filmeId);
 
-    Page<Filme> findByUserId(String userId, Pageable pageable);
+    Page<Filme> findByUserIdOrderByNumeroLikesDesc(String userId, Pageable pageable);
 
     List<Filme> findTop10ByOrderByNumeroLikesDesc();
 

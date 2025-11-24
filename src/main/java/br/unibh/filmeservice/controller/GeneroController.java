@@ -5,6 +5,7 @@ import br.unibh.filmeservice.dto.GeneroResponseDTO;
 import br.unibh.filmeservice.service.GeneroService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/generos")
 @Tag(name = "Gêneros", description = "API para gerenciamento de gêneros de filmes")
+@SecurityRequirement(name = "bearerAuth")
 public class GeneroController {
     private final GeneroService generoService;
 

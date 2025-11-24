@@ -7,6 +7,7 @@ import br.unibh.filmeservice.service.ImagensService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/filmes")
 @Tag(name = "Filmes", description = "API para gerenciamento de filmes")
+@SecurityRequirement(name = "bearerAuth")
 public class FilmeController {
     private final FilmeService filmeService;
     private final ImagensService imagensService;
