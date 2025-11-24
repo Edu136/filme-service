@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/filmes")
@@ -154,6 +155,33 @@ public class FilmeController {
     ){
         Page<FilmeResponseDTO> filmesPages = filmeService.getFilmesAdicionadosPor(userId,page,size);
         return ResponseEntity.ok(filmesPages);
+    }
+
+    @PostMapping("/{idFilme}/like")
+    public ResponseEntity<Void> likeFilme(
+            @PathVariable Long idFilme,
+            @RequestParam String idUser
+    ) {
+        filmeService.giveLikes(idFilme, idUser);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{idFilme}/unlike")
+    public ResponseEntity<Void> unlikeFilme(
+            @PathVariable Long idFilme,
+            @RequestParam String idUser
+    ) {
+        filmeService.undoLikes(idFilme, idUser);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{idFilme}/check-like")
+    public ResponseEntity<Map<String, Boolean>> checkLike(
+            @PathVariable Long idFilme,
+            @RequestParam String idUser
+    ) {
+        boolean isLiked = filmeService.usuarioCurtiuFilme(idFilme, idUser);
+        return ResponseEntity.ok(Map.of("isLiked", isLiked));
     }
 
 }

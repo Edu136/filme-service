@@ -6,7 +6,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -26,6 +28,7 @@ public class Filme {
     private Double ratingMedia;
     private Integer numeroLikes;
     private String userId;
+    private Set<String> usersIdQueCurtiram = new HashSet<>();
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "imagens_id", referencedColumnName = "id")

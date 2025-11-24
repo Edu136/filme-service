@@ -8,6 +8,7 @@ import br.unibh.filmeservice.mapper.FilmeMapper;
 import br.unibh.filmeservice.repository.FilmeRepository;
 import br.unibh.filmeservice.repository.GeneroRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.TransactionScoped;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -156,4 +157,38 @@ public class FilmeService {
         Page<Filme> filmesPage = filmeRepository.findByUserId(userId, pageable);
         return filmesPage.map(filmeMapper::toResponseDTO);
     }
+
+    @Transactional
+    public void giveLikes(Long filmeId, String userId) {
+        Filme filme = filmeById(filmeId);
+
+        if (filme.getUsersIdQueCurtiram().add(userId)) {
+            filme.setNumeroLikes(filme.getUsersIdQueCurtiram().size());
+            filmeRepository.save(filme);
+        }
+    }
+
+    @Transactional
+    public void undoLikes(Long filmeId, String userId) {
+        Filme filme = filmeById(filmeId);
+
+        if (filme.getUsersIdQueCurtiram().remove(userId)) {
+            filme.setNumeroLikes(filme.getUsersIdQueCurtiram().size());
+            filmeRepository.save(filme);
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public boolean usuarioCurtiuFilme(Long filmeId, String userId) {
+        return filmeById(filmeId)
+                .getUsersIdQueCurtiram()
+                .contains(userId);
+    }
+
+
+    private Filme filmeById (Long filmeId) {
+        return filmeRepository.findById(filmeId)
+                .orElseThrow(() -> new EntityNotFoundException("Filme com ID " + filmeId + " não encontrado."));
+    }
+
 }
